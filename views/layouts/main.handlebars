@@ -2,12 +2,30 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-		<link rel="stylesheet" href="/assets/css/style.css" type="text/css" />
-	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+		<!-- CSS Link -->
+		<link rel="stylesheet" href="/assets/css/burger_style.css" type="text/css" />
+
+
 		<title>Eat Da Burger!</title>
+
+</head>
+<body>
+
+	{{{ body }}}
 	
-	</head>
-	<body>
-		{{{ body }}}
-	</body>
+</body>
 </html>
+
+<!-- 
+The above {{{ body }}} format is a templating rule of handlebars we need to use.
+We need to use the folder structure:
+views 	/	layouts		/	main.handlebars
+		/	index.handlebars
+as this is also a handlebars template we need to follow.
+
+Handlebars will look for the content to insert for page and so {{{ body }}} will 
+reference index.handlebars by using the handlebars templated folder structure.
+-->

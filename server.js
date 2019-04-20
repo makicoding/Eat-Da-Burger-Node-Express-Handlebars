@@ -9,6 +9,7 @@
 
 var express = require("express");
 var bodyParser = require("body-parser");
+var methodOverride = require('method-override');
 
 // ================================================================================
 // EXPRESS CONFIGURATION
@@ -19,23 +20,33 @@ var bodyParser = require("body-parser");
 var app = express();
 
 // Sets an initial port. We'll use this later in our listener
-
 var PORT = process.env.PORT || 8080;        // Need to assign process.env.PORT for Heroku.  process.env.PORT will let Heroku assign
                                             // a port at random.  If that is unavailable, then the port will be assigned to port 8080
                                             // which is the standard default second choice for a webserver.
 
+// Serve static content for the app from the 'public' directory
+app.use(express.static(process.cwd() + '/public'));
+
 // Sets up the Express app to handle data parsing
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Override with POST having ?_method=DELETE
+app.use(methodOverride('_method'));
+
+// Set Handlebars as the view engine
+var exphbs = require('express-handlebars');
+
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 
 // ================================================================================
 // ROUTER
-// The below points our server to a series of "route" files.
-// These routes give our server a "map" of how to respond when users visit or request data from various URLs.
+// The route gives our server a "map" of how to respond when users visit or request data from various URLs.
 // ================================================================================
 
-require("./app/routing/apiRoutes")(app);
-require("./app/routing/htmlRoutes")(app);
+var routes = require('./controllers/burgers_controller.js');
+
+app.use('/', routes);
 
 // ================================================================================
 // LISTENER
@@ -72,6 +83,94 @@ doesn't need to be uploaded to GitHub.
 
 
 --------------------
+RUN SQL FILE TO CREATE DATABASE
+
+From the Mac Finder, open the schema.sql file in Sequel Pro.
+
+From the middle right of the page where there is a drop down menu that says "Run Previous",
+select "Run All Queries" from the drop down list. This will create the database (and table
+if the .sql file has the populate-database instructions inside it after the database-creation
+instructions. See notes below if the database-creation instructions are in a separate .sql
+file from the populate-database instructions .sql).
+
+
+
+--------------------
+IMPORT DATABASE CONTENT (IMPORT .sql FILE OR .csv FILE)    
+
+In the Sequel Pro App, select File / Import 
+Then select the .sql file that contains the instructions (i.e. the code) to populate database content
+This is the file that has the instructions:
+
+    // INSERT INTO
+and // VALUES
+
+In this case we would import seeds.sql.
+
+Since this is a .sql file with 
+populate-database instructions (unlike a csv without instructions), instead of doing File/Import
+in Sequel Pro, we can go to the Mac Finder, locate the seeds.sql file and from there open 
+in Sequel Pro. From the middle right of the page where there is a drop down menu that says 
+"Run Previous", select "Run All Queries" from the drop down list. This will create the table.
+
+
+
+Sometimes, the populate-database instructions may or may not be a separate .sql file from the .sql file that 
+had the instructions to create the database and table itself.  So we could put the content of seeds.sql 
+(populate-database instructions) at the bottom of the schema.sql file (create-database instructions)
+if we wanted to.  But in our case we separated the create-database instructions (schema.sql)
+from the populate-database instructions (seeds.sql). This is just purely to keep things organized.
+
+If the create-database instructions are in another .sql file (like in our case here), then you must have 
+selected and be inside the database you just created in Sequel Pro before importing the .sql that has the 
+populate-database instructions.
+
+
+
+You could also select File / Import and then import a .csv file and this would import all the data that is
+in that file. 
+
+.csv file can be created and saved from an Excel spreadsheet.
+
+
+
+For CSV import:
+Make sure that when the import prompt appears to map out the CSV fields properly. To do this, click on 
+each CSV field and this would show a drop down menu.  From there choose the corresponding to match
+the Table Target Fields that is in the column on the right (next to the CSV Fields column).
+
+
+
+Once these steps are done, the data is now imported to the database in Sequel Pro.
+
+
+
+--------------------
+REFRESH DATABASE CONTENT
+
+To refresh the database content in Sequel Pro, press the "refresh table contents" button at the bottom
+of the "Content section" of the databse.  You could also press on your keyboard:
+// command r
+
+
+
+--------------------
+EXPORT DATABASE CONTENT
+
+You can also select File / Export and your database as a SQL file.
+It is good practice to export and save your database as a SQL file periodically with the date 
+in the file name because each time you import a .csv file or .sql file to your database, 
+it will overwrite any previous database entries that you previously had for a particular database.
+
+So for example, let's say you have created a database called burgers_DB and within that you have
+created a table called products. 
+If you imported a SQL file or CSV file to the products table within burgers_DB,
+and then later on you once again imported a SQL file or CSV file to the products table within burgers_DB,
+the second import will overwrite all the data from the first import.
+
+
+
+--------------------
 npm init -y          (must do this at start of any node project if you are going to be using npm install to install packages!)
 
 At the start of any node project, this must be done:
@@ -97,6 +196,7 @@ into the command line (the name npm stands for Node Package Manager):
 // npm install express-handlebars
 // npm install mysql
 // npm install body-parser
+// npm install method-override
 
 
 
@@ -117,6 +217,7 @@ properly it will say:
 "express": "^4.16.4",           // 4.16.4 is the version number
 "express-handlebars": "^3.0.2", // 3.0.2 is the version number
 "mysql": "^2.17.1"              // 2.17.1 is the version number
+"method-override": "^3.0.0",    // 3.0.0 is the version number
 
 
 
@@ -129,7 +230,8 @@ You don't need to manually install every npm package like:
 npm install express                 // or:
 npm install express-handlebars      // or:
 npm install mysql                   // or:        
-npm install body-parser                     // etc.
+npm install body-parser             // or:
+npm install method-override                 // etc.
 
 
 
