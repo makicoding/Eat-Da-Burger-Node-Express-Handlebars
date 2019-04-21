@@ -1,4 +1,4 @@
-### Schema for JawsDB
+### Schema for Heroku JawsDB
 
 CREATE TABLE burgers
 (
