@@ -6,3 +6,5 @@ Eat-Da-Burger is a burger logger app using Node, Express, MySQL, Handlebars and 
 A user can create and add a burger name in the input box. Once the "Add Burger" button is clicked, the burger is added to the MySQL database and appears on the HTML page burger list as a button.  
 
 Once the HTML button for the new burger is clicked, this will update the database "devoured" boolean column from false (0) to true (1).
+
+Technologies used: HTML, CSS, JavaScript, Node, Express, Handlebars, ORM, MySQL, JawsDB, Heroku.
